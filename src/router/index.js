@@ -2,23 +2,53 @@ import { createWebHistory, createRouter } from 'vue-router'
 import Blog from '../components/Blog.vue'
 import Login from '../components/Login.vue'
 import Home from '../components/HomeStudent.vue'
+import Biographical from '../components/Biographical.vue'
+import Regedit from "@/components/Regedit.vue";
+import Position from "@/components/Position.vue";
+import PositionInfo from "@/components/PositionInfo.vue";
 // import Router from 'vue-router';
 const routes = [
     {
-        path:'/home',
+        path:'/',
+        name:'Default',
+        hidden: false,
+        component:Home
+    },{
+        path:'/login',
         name:'Login',
         hidden: false,
         component:Login
+    },{
+        path:'/regedit',
+        name:'Regedit',
+        hidden: false,
+        props: true,
+        component:Regedit
     },{
         path:'/test',
         name:'Blog',
         hidden: false,
         component:Blog
     },{
-        path:'/',
+        path:'/home',
         name:'Home',
         hidden: false,
         component:Home
+    },{
+        path:'/biographical',
+        name:'Biographical',
+        hidden: false,
+        component:Biographical
+    },{
+        path:'/position',
+        name:'Position',
+        hidden: false,
+        component:Position
+    },{
+        path:'/positionInfo',
+        name:'PositionInfo',
+        hidden: false,
+        component:PositionInfo
     }
 ]
 

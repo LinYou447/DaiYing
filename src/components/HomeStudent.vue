@@ -14,6 +14,23 @@ export default {
       isHovered3:false,
       isHovered4:false,
     }
+  },
+  methods:{
+    toBiographical(name){
+      //如果没有登录返回到登录页面
+      switch(name) {
+        case 'bio':
+          // this.$router.push('/profile')
+          this.$router.push("/biographical")
+          break
+        case 'position':
+          this.$router.push("/position")
+          break
+        case 'logout':
+          this.handleLogout()
+          break
+      }
+    }
   }
 }
 </script>
@@ -28,6 +45,7 @@ export default {
            :class="{ 'scale-up': isHovered, 'shadow': isHovered }"
            @mouseover="isHovered = true"
            @mouseleave="isHovered = false"
+           @click="toBiographical('bio')"
       >
         <div class="layotItemTop">
 
@@ -40,12 +58,13 @@ export default {
            :class="{ 'scale-up': isHovered1, 'shadow': isHovered1 }"
            @mouseover="isHovered1 = true"
            @mouseleave="isHovered1 = false"
+           @click="toBiographical('position')"
       >
         <div class="layotItemTop">
 
         </div>
         <div class="layotItemEnd">
-          个人简历
+          职位信息
         </div>
       </div>
       <div class="layotItem"
@@ -57,7 +76,7 @@ export default {
 
         </div>
         <div class="layotItemEnd">
-          个人简历
+          我的申请
         </div>
       </div>
       <div class="layotItem"
@@ -69,7 +88,7 @@ export default {
 
         </div>
         <div class="layotItemEnd">
-          个人简历
+          经验分享
         </div>
       </div>
       <div class="layotItem"
@@ -97,10 +116,11 @@ export default {
 .homePageStyle{
   width: 100%;
   height: 100%;
-  background-color: aqua;
+  //background-color: aqua;
   align-content: center;
   align-items: center;
   position: relative;
+  background-image: url("../../image/homeBackground.png");
 }
 .headPageStyle{
   width: 100%;
@@ -126,22 +146,29 @@ export default {
     padding-left: 15px;
     padding-right: 15px;
     padding-bottom: 30px;
-    background-color: aquamarine;
+    background:rgba(0,0,0,0.5);
     cursor: pointer;
-    .layotItemTop{
-      width: 100%;
-      height: 75%;
-      background-color: bisque;
-    }
-    .layotItemEnd{
-      width: 100%;
-      height: 25%;
-      display: flex;
-      justify-content: space-around;
-      background-color: chocolate;
-      align-items: center;
-      align-content: center;
-    }
+    border: 1px solid #ccc;
+  }
+  .layotItemTop{
+    width: 100%;
+    height: 75%;
+    background-color: bisque;
+    background-image: url("../../image/homeItem.png");
+    background-size: cover;
+  }
+  .layotItemEnd{
+    width: 100%;
+    height: 25%;
+    display: flex;
+    justify-content: space-around;
+    //background-color: chocolate;
+    background: linear-gradient(to bottom, #f6f6f6, #5d6b72);
+    align-items: center;
+    align-content: center;
+    color: white;
+    font-size: 20px;
+    font-family: math;
   }
   .scale-up {
     transform: scale(1.1); /* 放大10% */

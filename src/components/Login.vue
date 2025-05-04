@@ -17,6 +17,15 @@
 .demo-auto-login a{
   float: right;
 }
+.regeditStyle{
+  height: 100%;
+  width: 100%;
+  color: #2d8cf0;
+  display: flex;
+  align-content: center;
+  align-items: center;
+  justify-content: flex-end;
+}
 </style>
 
 <template>
@@ -27,7 +36,10 @@
         <Password name="password" />
         <div class="demo-auto-login">
 <!--          <Checkbox v-model="autoLogin" size="large">自动登录</Checkbox>-->
-          <a style="margin-bottom: 15px">忘记密码</a>
+          <div class="regeditStyle">
+            <div @click="regedit" style="margin-right: 20px;cursor: pointer">注册</div>
+            <div style="cursor: pointer">忘记密码</div>
+          </div>
         </div>
         <Submit @click="login" />
       </Login>
@@ -58,7 +70,10 @@ export default {
       }
     },
     login(){
-      this.$router.push("/test")
+      this.$router.push("/home")
+    },
+    regedit(){
+      this.$router.push("/regedit")
     }
   }
 }
