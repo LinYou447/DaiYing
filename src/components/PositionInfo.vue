@@ -33,6 +33,7 @@
   justify-content: center;
   min-height: calc(100vh - 295px);
   padding: 40px 0;
+  position: relative;
 }
 .layout-content-left-box{
   background: #fff;
@@ -71,6 +72,87 @@
   background-image: url("../../image/foot.png");
   background-size: cover;
 }
+.font-des-style{
+  color: #646a73;
+  font-size: 14px;
+  line-height: 2em;
+  overflow: hidden;
+  white-space: pre;
+  white-space: pre-line;
+  word-break: break-word;
+  margin-top: 20px;
+}
+.title-icon{
+  border-left: 4px solid #3370ff;
+  content: "";
+  display: block;
+  height: 20px;
+  left: 1px;
+  position: absolute;
+  top: 47px;
+}
+.layout-content-right-box-item{
+  width: 100%;
+  height: 90px;
+  margin-bottom: 25px;
+  color: #1f2329;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  max-width: 248px;
+  overflow: hidden;
+  //text-overflow: ellipsis;
+}
+.font-style{
+  align-items: center;
+  color: #646a73;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+  margin-top: 4px;
+}
+.font-title-style{
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #1f2329;
+  display: -webkit-box;
+  display: -moz-box;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  max-width: 248px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.font-title-style:hover{
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  color: #3370ff;
+  display: -webkit-box;
+  display: -moz-box;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 24px;
+  max-width: 248px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.font-h2{
+  color: #1f2329;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.52;
+  margin: 40px 0 8px;
+  padding-left: 10px;
+  position: relative;
+}
 </style>
 <template>
   <div class="positionInfoBody">
@@ -88,8 +170,47 @@
       </Header>
       <Content class="layout-content">
         <div class="layout-content-left">
-          <div class="layout-content-left-box"></div>
-          <div class="layout-content-right-box"></div>
+          <div class="layout-content-left-box">
+            <div>
+              <h1 style="color: black">{{positionInfo.title}}</h1>
+              <span style="color: black;font-size: 14px">{{positionInfo.city}}&nbsp;&nbsp; |&nbsp;&nbsp; 职位ID： {{positionInfo.positionId}}&nbsp;&nbsp; |&nbsp;&nbsp; 薪资：{{positionInfo.money}}</span>
+              <div style="width: 100%;display: flex;position: relative">
+                <div class="title-icon"></div>
+                <h2 class="font-h2">职位描述</h2>
+              </div>
+              <span class="font-des-style">{{positionInfo.positionDesc}}</span>
+              <div style="width: 100%;display: flex;position: relative">
+                <div class="title-icon"></div>
+                <h2 class="font-h2">职位要求</h2>
+              </div>
+              <span class="font-des-style">{{positionInfo.positionRequire}}</span>
+            </div>
+            <div style="margin-top: 30px;display: flex">
+              <Button type="primary" @click="toBioView">申请职位</Button>
+              <Button style="margin-left: 20px;width: 96px" @click="toReturn">返回</Button>
+            </div>
+          </div>
+          <div class="layout-content-right-box">
+            <div style="width: 100%;display: flex;position: relative;margin-bottom: 35px">
+              <div class="title-icon"></div>
+              <h2 class="font-h2">相关职位</h2>
+            </div>
+            <div class="layout-content-right-box-item">
+              <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
+              <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+            </div>
+            <div class="layout-content-right-box-item">
+              <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
+              <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+            </div>
+            <div class="layout-content-right-box-item">
+              <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
+              <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+            </div>
+          </div>
         </div>
       </Content>
       <Footer  class="layout-footer">
@@ -99,13 +220,30 @@
   </div>
 </template>
 <script>
+import {Button} from "view-ui-plus";
+
 export default {
   name:'PositionInfoPage',
+  components: {Button},
   data(){
     return{
-      positionInfo:{},
+      positionInfo:{
+        title:"JAVA开发工程师",
+        city:'北京',
+        money:'面谈',
+        positionId:'A47541',
+        positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+            '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
+            '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
+            '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
+        positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
+            '2、学习能力强，有独立解决问题的能力；\n' +
+            '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
+            '4、有良好的沟通能力和业务理解能力。'
+      },
       isHovered: false,
       isHovered1: false,
+      isHovered2:false,
     }
   },
   mounted() {
@@ -124,6 +262,12 @@ export default {
     },
     handleMouseOut() {
       this.isHovered = false;
+    },
+    toBioView(){
+      this.$router.push("/bioView")
+    },
+    toReturn(){
+      this.$router.push("/position")
     }
   }
 }

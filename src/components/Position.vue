@@ -8,11 +8,15 @@
   width: 100%;
   height: 200px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 40px 0;
   padding-left: 50px;
   cursor: pointer;
   display: flex;
+}
+.list_item:hover{
+  transition: box-shadow 0.5s ease-in-out;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 .list_item .list_item_info {
   padding-right: 20px;

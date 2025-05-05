@@ -6,6 +6,9 @@ import Biographical from '../components/Biographical.vue'
 import Regedit from "@/components/Regedit.vue";
 import Position from "@/components/Position.vue";
 import PositionInfo from "@/components/PositionInfo.vue";
+import BioView from "@/components/BioView.vue";
+import MyRequest from "@/components/MyRequest.vue";
+import LvShare from "@/components/LvShare.vue";
 // import Router from 'vue-router';
 const routes = [
     {
@@ -40,6 +43,11 @@ const routes = [
         hidden: false,
         component:Biographical
     },{
+        path:'/bioView',
+        name:'Bioview',
+        hidden: false,
+        component:BioView
+    },{
         path:'/position',
         name:'Position',
         hidden: false,
@@ -49,6 +57,16 @@ const routes = [
         name:'PositionInfo',
         hidden: false,
         component:PositionInfo
+    },{
+        path:'/myRequest',
+        name:'MyRequest',
+        hidden: false,
+        component:MyRequest
+    },{
+        path:'/lvShare',
+        name:'LvShare',
+        hidden: false,
+        component:LvShare
     }
 ]
 

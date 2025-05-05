@@ -46,10 +46,22 @@
 .demo-drawer-profile .ivu-col{
   margin-bottom: 12px;
 }
+.home-style{
+  cursor: pointer;
+  color: black;
+  font-size: 22px;
+  position: absolute;
+  right: 235px;
+  top: 14px;
+}
+.home-style:hover{
+  color: #2d8cf0;
+}
 </style>
 
 <template>
   <div class="headBody">
+    <div @click="toHome" class="home-style">首页</div>
     <div class="personIcon">
       <Space size="large" wrap>
         <Dropdown
@@ -169,6 +181,9 @@ export default {
     }
   },
   methods:{
+    toHome(){
+      this.$router.push("/home")
+    },
     handleMenuItem(name) {
       switch(name) {
         case 'profile':
