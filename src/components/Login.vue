@@ -41,7 +41,7 @@
             <div style="cursor: pointer">忘记密码</div>
           </div>
         </div>
-        <Submit @click="login" />
+        <Submit  />
       </Login>
     </div>
   </div>
@@ -50,6 +50,8 @@
 <script>
 // import {Button} from "view-ui-plus";
 // eslint-disable-next-line vue/no-export-in-script-setup
+import axios from "axios";
+
 export default {
   name: 'LoginPage',
   props: {
@@ -63,10 +65,27 @@ export default {
   methods: {
     handleSubmit (valid, { username, password }) {
       if (valid) {
-        this.$Modal.info({
-          title: '输入的内容如下：',
-          content: 'username: ' + username + ' | password: ' + password
-        });
+        // this.$Modal.info({
+        //   title: '输入的内容如下：',
+        //   content: 'username: ' + username + ' | password: ' + password
+        // });
+        var formData = {
+          username: username,
+          password: password
+        }
+        axios.post(this.$apiBaseUrl+'/api/user/login',JSON.stringify(formData),
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              }
+            }).then(res=>{
+          if(res.data.code===500){
+            this.$Message.error('登录失败!'+res.data.message);
+          }else{
+            this.$Message.success(res.data.message);
+            this.$router.push("/home");
+          }
+        })
       }
     },
     login(){

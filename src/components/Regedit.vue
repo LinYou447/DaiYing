@@ -47,8 +47,8 @@
         <FormItem label="电话" prop="phone">
           <Input v-model="formValidate.phone" placeholder="请输入电话"></Input>
         </FormItem>
-        <FormItem label="邮箱" prop="mail">
-          <Input v-model="formValidate.mail" placeholder="请输入邮箱"></Input>
+        <FormItem label="邮箱" prop="email">
+          <Input v-model="formValidate.email" placeholder="请输入邮箱"></Input>
         </FormItem>
         <FormItem label="密码" prop="password">
           <Input v-model="formValidate.password" type="password" password placeholder="请输入密码" />
@@ -67,6 +67,7 @@
 
 <script>
 import {Input} from "view-ui-plus";
+import axios from "axios";
 
 export default {
   name:'BiographicalNote',
@@ -81,10 +82,10 @@ export default {
       value1: '110000',
       editValue:false,
       formValidate: {
-        username: '',
-        password: '',
+        username: '小不点',
+        password: '123456',
         phone: '152035077334',
-        mail: 'wojibuzhu447@163.com',
+        email: 'wojibuzhu447@163.com',
       },
       ruleValidate: {
         username: [
@@ -96,7 +97,7 @@ export default {
         phone: [
           { required: true, message: '电话不能为空', trigger: 'blur' }
         ],
-        mail: [
+        email: [
           { required: true, message: '邮箱不能为空', trigger: 'blur' },
           { type: 'email', message: '邮箱格式错误', trigger: 'blur' }
         ],
@@ -104,11 +105,6 @@ export default {
     }
   },
   mounted() {
-    // if (this.isEdit){
-    //   this.editValue = this.isEdit
-    // }else{this.editValue = false}
-    // eslint-disable-next-line no-debugger
-    debugger;
     if(this.$route.query.isEdit){
       this.editValue = this.$route.query.isEdit;
     }else{
@@ -119,6 +115,22 @@ export default {
     returnHome(){
       this.$router.push("/home")
     },
+    regedit(){
+      this.formValidate.role = "JOBSEEKERS";
+      axios.post(this.$apiBaseUrl+'/api/user/regedit',JSON.stringify(this.formValidate),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+            }
+          }).then(res=>{
+        if(res.data.code===500){
+          this.$Message.error('注册失败!'+res.data.message);
+        }else{
+          this.$Message.success(res.data.message);
+          this.$router.push("/login");
+        }
+      })
+    },
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
@@ -126,11 +138,8 @@ export default {
             this.$Message.success('修改成功!');
             this.$router.push("/login")
           }else{
-            this.$Message.success('注册成功!');
-            this.$router.push("/login")
+            this.regedit();
           }
-        } else {
-          this.$Message.error('注册失败!');
         }
       })
     },
