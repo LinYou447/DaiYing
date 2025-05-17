@@ -7,12 +7,12 @@
   position: relative;
 }
 .personIcon{
-  width: 60px;
   height: 100%;
   align-content: center;
   align-items: center;
   position: absolute;
-  right: 0;
+  display: flex;
+  right: 20px;
 }
 .clickable-avatar {
   border: 2px solid #fff;
@@ -57,6 +57,16 @@
 .home-style:hover{
   color: #2d8cf0;
 }
+.user-name{
+  font-size: 16px;
+  font-family: initial;
+  color: black;
+  cursor: pointer;
+  margin-left: 7px;
+}
+.user-name:hover{
+  color: #2d8cf0;
+}
 </style>
 
 <template>
@@ -92,6 +102,10 @@
           <!-- 下拉菜单内容 -->
         </Dropdown>
       </Space>
+
+      <div @click="toLogin" class="user-name">
+        {{this.userName}}
+      </div>
     </div>
     <Drawer :closable="false" width="640" v-model="value">
       <p :style="pStyle">用户资料</p>
@@ -99,15 +113,15 @@
       <div class="demo-drawer-profile">
         <Row>
           <Col span="12">
-            姓  名: 刘德华
+            姓  名: {{formData.name}}
           </Col>
           <Col span="12">
-            邮  箱: wojibuzhu447@163.com
+            邮  箱: {{formData.email}}
           </Col>
         </Row>
         <Row>
           <Col span="12">
-            城  市: 北京
+            城  市: {{ formData.city }}
           </Col>
           <Col span="12">
             国  家: 中国
@@ -118,7 +132,7 @@
             出生日期: 1999-02-20
           </Col>
           <Col span="12">
-            联系电话: 15203507334
+            联系电话: {{formData.phone}}
           </Col>
         </Row>
 <!--        Message: Hello, Developer-->
@@ -128,10 +142,10 @@
       <div class="demo-drawer-profile">
         <Row>
           <Col span="12">
-            学  历: 本科
+            学  历: {{formData.edu}}
           </Col>
           <Col span="12">
-            专  业: 软件工程
+            专  业: {{formData.major}}
           </Col>
         </Row>
         <Row>
@@ -139,7 +153,7 @@
             毕业日期: 2025-06-30
           </Col>
         </Row>
-        简  介: 可熟练运用java开发软件，可独立开发前后端，具备一定sql调优能力，了解jvm运行机制，专业技术牢靠.
+        {{formData.eduBack}}
       </div>
       <Divider />
       <p :style="pStyle">实习经历</p>
@@ -149,12 +163,12 @@
             实习公司: 百度
           </Col>
           <Col span="12">
-            联系电话: +86 18888888888
+            联系电话: +86 {{formData.phone}}
           </Col>
         </Row>
         <Row>
           <Col span="24">
-            实习收获: 熟练掌握专业知识，对问题的处理能力得到了显著提升，检验了自我的学习能力。强化提升了自我认识。
+            实习收获: {{formData.internshipExperience}}
           </Col>
         </Row>
       </div>
@@ -163,6 +177,9 @@
 </template>
 
 <script>
+import axios from "axios";
+import {inject} from "vue";
+
 export default {
   name:'HeadPage',
   data(){
@@ -170,6 +187,7 @@ export default {
       avatarUrl:'https://i.loli.net/2017/08/21/599a521472424.jpg',
       isMobile:true,
       list:"list",
+      tokenFix:'',
       value: false,
       pStyle: {
         fontSize: '16px',
@@ -177,7 +195,17 @@ export default {
         lineHeight: '24px',
         display: 'block',
         marginBottom: '16px'
-      }
+      },
+      userName:"点击登录",
+      haveUser:false,
+      formData:{}
+    }
+  },
+  mounted() {
+    this.tokenFix = inject("tokenFix");
+    if(sessionStorage.getItem("userName")!=='' && sessionStorage.getItem("userName")!==null ){
+      this.userName = sessionStorage.getItem("userName");
+      this.haveUser = true;
     }
   },
   methods:{
@@ -204,6 +232,27 @@ export default {
     },
     proView(){
       this.value=true;
+      this.getPersonInfo();
+    },
+    getPersonInfo(){
+      axios.get(this.$apiBaseUrl+'/api/biographical/getByUserId?userId='+sessionStorage.getItem("userId"),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.formData = res.data.data;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
+    toLogin(){
+      if(!this.haveUser){
+        this.$router.push("/login")
+      }
     },
     // 退出登录示例
     handleLogout() {
@@ -211,6 +260,9 @@ export default {
         title: '确认退出',
         content: '您确定要退出当前账号吗？',
         onOk: () => {
+          sessionStorage.removeItem('token');
+          sessionStorage.removeItem('userId');
+          sessionStorage.removeItem('userName');
           // 执行退出逻辑
           this.$Message.success('已退出登录');
           //清空页面登录信息 返回登录页面

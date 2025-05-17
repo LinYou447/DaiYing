@@ -14,6 +14,8 @@ import apiClient from './plugins/axios';
 import ApiConfig from './plugins/apiConfig';
 
 const app = createApp(App);
+
+app.provide('tokenFix', 'Daiying ');
 app.use(apiClient);
 app.use(ApiConfig);
 app.use(router);

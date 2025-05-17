@@ -79,17 +79,17 @@ export default {
                 'Content-Type': 'application/json',
               }
             }).then(res=>{
-          if(res.data.code===500){
-            this.$Message.error('登录失败!'+res.data.message);
-          }else{
+          if(res.data.code===200){
             this.$Message.success(res.data.message);
+            sessionStorage.setItem('token', res.data.data.token);
+            sessionStorage.setItem('userId', res.data.data.userId);
+            sessionStorage.setItem('userName', res.data.data.userName);
             this.$router.push("/home");
+          }else{
+            this.$Message.error(res.data.message);
           }
         })
       }
-    },
-    login(){
-      this.$router.push("/home")
     },
     regedit(){
       this.$router.push("/regedit")

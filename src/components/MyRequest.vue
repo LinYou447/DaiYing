@@ -25,6 +25,7 @@
   height: 100%;
   width: 100%;
   overflow-y: scroll;
+  overflow: hidden;
   margin-bottom: 20px;
   &:last-child {
     margin-bottom: 0;
@@ -74,11 +75,11 @@
     <div class="my-request-body">
       <el-row :gutter="20">
         <el-col class="grid-item" v-for="(item,index) in items" :key="index" :span="8">
-          <div @click="showProgress(item.state,item.stateDes)" class="grid-content" :class="item.state === 1 ? 'bg-purple' : ( item.state === 2 ? 'bg-purple2' : 'bg-purple3')">
-            <div class="grid-item-style" :class="item.state === 3 ? 'font-color' : 'font-color-black'">{{item.title}}</div>
+          <div @click="showProgress(item.state,item.mes)" class="grid-content" :class="item.state === 1 ? 'bg-purple' : ( item.state === 2 ? 'bg-purple2' : 'bg-purple3')">
+            <div class="grid-item-style" :class="item.state === 3 ? 'font-color' : 'font-color-black'">{{item.positionName}}</div>
             <div style="margin-bottom: 5px">
               <span style="font-size: 16px">提交时间：</span>
-              <span :class="item.state === 3 ? 'font-color' : 'font-color-black'">2025-05-24</span>
+              <span :class="item.state === 3 ? 'font-color' : 'font-color-black'">{{item.createTime}}</span>
             </div>
             <div style="margin-bottom: 5px">
               <span style="font-size: 16px">审核状态：</span>
@@ -86,7 +87,7 @@
             </div>
             <div style="margin-bottom: 5px">
               <span style="font-size: 16px">公司名称：</span>
-              <span :class="item.state === 3 ? 'font-color' : 'font-color-black'">XXXXXXXX</span>
+              <span :class="item.state === 3 ? 'font-color' : 'font-color-black'">{{item.companyName}}</span>
             </div>
           </div>
         </el-col>
@@ -98,198 +99,47 @@
 
 <script>
 import Head from '../layout/Head.vue'
+import {inject} from "vue";
+import axios from "axios";
 export default {
   name:'MyRequest',
   components:{Head},
   data(){
     return{
       modal:false,
-      items:[
-          {
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-            state:1,
-            stateDes:'审核通过！'
-         }, {
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:3,
-          stateDes:'太丑审核不通过！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:1,
-          stateDes:'审核通过！'
-        }, {
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:3,
-          stateDes:'太丑审核不通过！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:1,
-          stateDes:'审核通过！'
-        }, {
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:3,
-          stateDes:'太丑审核不通过！'
-        },{
-          title:"JAVA开发工程师",
-          city:'北京',
-          money:'面谈',
-          positionId:'A47541',
-          positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-          positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
-              '2、学习能力强，有独立解决问题的能力；\n' +
-              '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
-              '4、有良好的沟通能力和业务理解能力。',
-          state:2,
-          stateDes:'正在审核中！'
-        },
-      ]
+      tokenFix:'',
+      items:[]
     }
   },
+  mounted() {
+    this.tokenFix = inject("tokenFix");
+    this.getData()
+  },
   methods:{
+    getData(){
+      axios.get(this.$apiBaseUrl+'/api/positionRequest/getByUserId?userId='+sessionStorage.getItem("userId"),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          res.data.data.forEach(item=>{
+            if(item.state==='审核通过'){
+              item.state=1;
+            }else if(item.state === '待审核'){
+              item.state = 2;
+            }else{
+              item.state = 3;
+            }
+          })
+          this.items = res.data.data;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
     instance (state,stateDes) {
       const title = '审核状态';
       const content = stateDes;

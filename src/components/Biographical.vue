@@ -40,14 +40,14 @@
             <FormItem label="姓名" prop="name">
               <Input v-model="formValidate.name" placeholder="请输入姓名"></Input>
             </FormItem>
-            <FormItem label="性别" prop="gender">
-              <RadioGroup v-model="formValidate.gender">
-                <Radio label="male">男</Radio>
-                <Radio label="female">女</Radio>
+            <FormItem label="性别" prop="sex">
+              <RadioGroup v-model="formValidate.sex">
+                <Radio label="1">男</Radio>
+                <Radio label="0">女</Radio>
               </RadioGroup>
             </FormItem>
-            <FormItem label="邮箱" prop="mail">
-              <Input v-model="formValidate.mail" placeholder="请输入邮箱"></Input>
+            <FormItem label="邮箱" prop="email">
+              <Input v-model="formValidate.email" placeholder="请输入邮箱"></Input>
             </FormItem>
           </Col>
           <Col span="2"></Col>
@@ -68,64 +68,36 @@
         </Row>
 
         <FormItem label="所在城市" prop="city">
-<!--          <Select v-model="formValidate.city" placeholder="">-->
-<!--            <Option value="beijing">北京</Option>-->
-<!--            <Option value="shanghai">上海</Option>-->
-<!--            <Option value="shenzhen">天津</Option>-->
-<!--          </Select>-->
-          <City v-model="formValidate.city" />
+          <City use-name v-model="formValidate.city" />
         </FormItem>
-        <FormItem label="籍贯" prop="name1">
-          <Input v-model="formValidate.name1" placeholder="请输入籍贯"></Input>
+        <FormItem label="籍贯" prop="nativePlace">
+          <Input v-model="formValidate.nativePlace" placeholder="请输入籍贯"></Input>
         </FormItem>
-        <FormItem label="电话" prop="name2">
-          <Input v-model="formValidate.name2" placeholder="请输入电话"></Input>
+        <FormItem label="电话" prop="phone">
+          <Input v-model="formValidate.phone" placeholder="请输入电话"></Input>
         </FormItem>
-        <FormItem label="学历" prop="name3">
-          <RadioGroup v-model="formValidate.name3">
+        <FormItem label="学历" prop="edu">
+          <RadioGroup v-model="formValidate.edu">
             <Radio label="zhuanke">专科</Radio>
             <Radio label="benke">本科</Radio>
             <Radio label="shuoshi">硕士</Radio>
             <Radio label="boshi">博士</Radio>
           </RadioGroup>
         </FormItem>
-        <FormItem label="专业" prop="name4">
-          <Input v-model="formValidate.name4" placeholder="请输入专业"></Input>
+        <FormItem label="专业" prop="major">
+          <Input v-model="formValidate.major" placeholder="请输入专业"></Input>
         </FormItem>
-<!--        <FormItem label="预计入职时间">-->
-<!--          <Row>-->
-<!--            <Col span="11">-->
-<!--              <FormItem prop="date">-->
-<!--                <DatePicker type="date" placeholder="Select date" v-model="formValidate.date"></DatePicker>-->
-<!--              </FormItem>-->
-<!--            </Col>-->
-<!--            <Col span="2" style="text-align: center">-</Col>-->
-<!--            <Col span="11">-->
-<!--              <FormItem prop="time">-->
-<!--                <TimePicker type="time" placeholder="Select time" v-model="formValidate.time"></TimePicker>-->
-<!--              </FormItem>-->
-<!--            </Col>-->
-<!--          </Row>-->
-<!--        </FormItem>-->
-<!--        <FormItem label="Hobby" prop="interest">-->
-<!--          <CheckboxGroup v-model="formValidate.interest">-->
-<!--            <Checkbox label="Eat"></Checkbox>-->
-<!--            <Checkbox label="Sleep"></Checkbox>-->
-<!--            <Checkbox label="Run"></Checkbox>-->
-<!--            <Checkbox label="Movie"></Checkbox>-->
-<!--          </CheckboxGroup>-->
-<!--        </FormItem>-->
-        <FormItem label="教育背景" prop="desc">
-          <Input v-model="formValidate.desc" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
+        <FormItem label="教育背景" prop="eduBack">
+          <Input v-model="formValidate.eduBack" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
         </FormItem>
-        <FormItem label="实习经历" prop="desc1">
-          <Input v-model="formValidate.desc1" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
+        <FormItem label="实习经历" prop="internshipExperience">
+          <Input v-model="formValidate.internshipExperience" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
         </FormItem>
-        <FormItem label="证书技能" prop="desc2">
-          <Input v-model="formValidate.desc2" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
+        <FormItem label="证书技能" prop="certificateSkills">
+          <Input v-model="formValidate.certificateSkills" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
         </FormItem>
-        <FormItem label="自我评价" prop="desc3">
-          <Input v-model="formValidate.desc3" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
+        <FormItem label="自我评价" prop="selfEvaluation">
+          <Input v-model="formValidate.selfEvaluation" type="textarea" :autosize="{minRows: 3,maxRows: 5}" placeholder="请输入..."></Input>
         </FormItem>
         <FormItem>
           <div class="buttonStyle">
@@ -141,6 +113,8 @@
 
 <script>
 import {Input} from "view-ui-plus";
+import axios from "axios";
+import {inject} from 'vue'
 
 export default {
   name:'BiographicalNote',
@@ -148,41 +122,43 @@ export default {
   data(){
     return{
       value1: '110000',
+      tokenFix: '',
       formValidate: {
+        id:'',
         name: '刘德华',
-        name1: '湖北省孝感市',
-        name2: '152035077334',
-        name3: 'benke',
-        name4: '软件工程',
-        mail: 'wojibuzhu447@163.com',
+        nativePlace: '湖北省孝感市',
+        phone: '152035077334',
+        edu: 'benke',
+        major: '软件工程',
+        email: 'wojibuzhu447@163.com',
         city: '',
-        gender: 'male',
+        sex: '1',
         interest: [],
         date: '',
         time: '',
-        desc: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc1: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc2: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc3: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        eduBack: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        internshipExperience: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        certificateSkills: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        selfEvaluation: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
       },
       ruleValidate: {
         name: [
           { required: true, message: '姓名不能为空', trigger: 'blur' }
         ],
-        name1: [
+        nativePlace: [
           { required: true, message: '籍贯不能为空', trigger: 'blur' }
         ],
-        name2: [
+        phone: [
           { required: true, message: '联系电话不能为空', trigger: 'blur' }
         ],
-        mail: [
+        email: [
           { required: true, message: '邮箱不能为空', trigger: 'blur' },
           { type: 'email', message: '邮箱格式错误', trigger: 'blur' }
         ],
         city: [
           { required: true, message: '请选择城市', trigger: 'change' }
         ],
-        gender: [
+        sex: [
           { required: true, message: '请选择性别', trigger: 'change' }
         ],
         interest: [
@@ -195,55 +171,88 @@ export default {
         time: [
           { required: true, type: 'string', message: 'Please select time', trigger: 'change' }
         ],
-        desc: [
+        eduBack: [
           { required: true, message: '请填写教育背景', trigger: 'blur' },
-          { type: 'string', min: 20, message: '最少20个字符', trigger: 'blur' }
+          { type: 'string', min: 1, message: '教育背景不能为空', trigger: 'blur' }
         ],
-        desc1: [
+        internshipExperience: [
           { required: true, message: '请填写校园经历', trigger: 'blur' },
-          { type: 'string', min: 20, message: '最少20个字符', trigger: 'blur' }
+          { type: 'string', min: 1, message: '校园经历不能为空', trigger: 'blur' }
         ],
-        desc2: [
+        certificateSkills: [
           { required: true, message: '请填写证书技能', trigger: 'blur' },
-          { type: 'string', min: 20, message: '最少20个字符', trigger: 'blur' }
+          { type: 'string', min: 1, message: '证书技能不能为空', trigger: 'blur' }
         ],
-        desc3: [
+        selfEvaluation: [
           { required: true, message: '请填写自我评价', trigger: 'blur' },
-          { type: 'string', min: 20, message: '最少20个字符', trigger: 'blur' }
+          { type: 'string', min: 1, message: '自我评价不能为空', trigger: 'blur' }
         ],
       }
     }
   },
+  mounted() {
+    this.tokenFix = inject("tokenFix");
+    this.getBiographical();
+  },
   methods:{
+    getBiographical(){
+      axios.get(this.$apiBaseUrl+'/api/biographical/getByUserId?userId='+sessionStorage.getItem("userId"),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          // this.$Message.success(res.data.message);
+          this.formValidate = res.data.data;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
     returnHome(){
       this.$router.push("/home")
+      this.tokenFix = inject('tokenFix');
     },
     handleSubmit (name) {
       this.$refs[name].validate((valid) => {
         if (valid) {
-          this.$Message.success('简历保存成功!');
-        } else {
-          this.$Message.error('保存失败!');
+          this.formValidate.userId = sessionStorage.getItem("userId");
+          axios.post(this.$apiBaseUrl+'/api/biographical/create',this.formValidate,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+                }
+              }).then(res=>{
+            if(res.data.code===200){
+              this.$Message.success(res.data.message);
+              // this.formValidate = res.data.data;
+            }else{
+              this.$Message.error(res.data.message);
+            }
+          })
         }
       })
     },
     handleReset (name) {
       this.formValidate={
         name: '',
-            name1: '',
-            name2: '',
-            name3: '',
-            name4: '',
-            mail: '',
+            nativePlace: '',
+            phone: '',
+            edu: '',
+            major: '',
+            email: '',
             city: '',
-            gender: '',
+            sex: '',
             interest: [],
             date: '',
             time: '',
-            desc: '',
-            desc1: '',
-            desc2: '',
-            desc3: '',
+            eduBack: '',
+            internshipExperience: '',
+            certificateSkills: '',
+            selfEvaluation: '',
       };
       this.$refs[name].resetFields();
     }

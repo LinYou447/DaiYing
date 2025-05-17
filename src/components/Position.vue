@@ -101,25 +101,28 @@
         <Tag style="cursor: pointer" color="blue">Go语言开发</Tag>
       </Header>
       <Content class="layout-content">
-        <div @click="positionInfo(item.id)" v-for="item in this.itemList" :key="item.id"  class="list_item" flex="main:justify cross:center">
+        <div @click="positionInfo(item.id,item.companyId)" v-for="item in this.itemList" :key="item.id"  class="list_item" flex="main:justify cross:center">
           <div class="list_item_info">
             <div class="list_item_title">
-              <span>{{item.company}}---{{ item.position }}</span>
-              <span class="hot">急招</span>
+              <span style="margin-right: 10px">{{item.cpmpanyname}}---{{ item.name }}</span>
+<!--              <span class="hot">{{item.degree}}</span>-->
+              <Tag v-if="item.degree==='不急'" color="success">不急</Tag>
+              <Tag v-if="item.degree==='紧急'" color="error">紧急</Tag>
+              <Tag v-if="item.degree==='一般'" color="warning">一般</Tag>
             </div>
             <div class="list_item_type">
-              <span>{{item.posCategory}}</span>
+              <span>{{item.recruitmentType}}</span>
               <span class="type_border"></span>
               <span>{{item.category}}</span>
               <span class="type_border"></span>
-              <span>{{item.contry}}</span>
+              <span>{{item.country}}</span>
             </div>
             <div class="list_item_map">
-              <span>工作地点：{{item.workBase}}</span>
+              <span>工作地点：{{item.workLocation}}</span>
             </div>
           </div>
           <div class="list_item_image">
-            <span>{{item.des}}</span>
+            <span>职位简介：{{item.jobDescription}}</span>
           </div>
         </div>
       </Content>
@@ -129,69 +132,75 @@
 </template>
 
 <script>
+import axios from "axios";
+import {inject} from "vue";
+
 export default {
   name:'PositionPage',
   data(){
     return{
+      tokenFix:'',
       itemList:[
-        {
-          id:'1',
-          company:'XXX科技公司',
-          position:'Java开发工程师',
-          isHot:'急招',
-          posCategory:'校园招聘',
-          category:'技术研究类',
-          contry:'China',
-          workBase:'北京，天津',
-          des:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
-        },{
-          id:'2',
-          company:'XXX科技公司',
-          position:'Java开发工程师',
-          isHot:'急招',
-          posCategory:'校园招聘',
-          category:'技术研究类',
-          contry:'China',
-          workBase:'北京，天津',
-          des:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
-        },{
-          id:'3',
-          company:'XXX科技公司',
-          position:'Java开发工程师',
-          isHot:'急招',
-          posCategory:'校园招聘',
-          category:'技术研究类',
-          contry:'China',
-          workBase:'北京，天津',
-          des:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
-        },{
-          id:'4',
-          company:'XXX科技公司',
-          position:'Java开发工程师',
-          isHot:'急招',
-          posCategory:'校园招聘',
-          category:'技术研究类',
-          contry:'China',
-          workBase:'北京，天津',
-          des:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
-              '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
-              '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
-              '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
-        }
+        // {
+        //   id:'1',
+        //   companyname:'XXX科技公司',
+        //   name:'Java开发工程师',
+        //   isHot:'急招',
+        //   posCategory:'校园招聘',
+        //   category:'技术研究类',
+        //   country:'China',
+        //   workLocation:'北京，天津',
+        //   jobDescription:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+        //       '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
+        //       '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
+        //       '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
+        // },{
+        //   id:'2',
+        //   companyname:'XXX科技公司',
+        //   name:'Java开发工程师',
+        //   isHot:'急招',
+        //   posCategory:'校园招聘',
+        //   category:'技术研究类',
+        //   country:'China',
+        //   workLocation:'北京，天津',
+        //   jobDescription:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+        //       '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
+        //       '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
+        //       '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
+        // },{
+        //   id:'3',
+        //   companyname:'XXX科技公司',
+        //   name:'Java开发工程师',
+        //   isHot:'急招',
+        //   posCategory:'校园招聘',
+        //   category:'技术研究类',
+        //   country:'China',
+        //   workLocation:'北京，天津',
+        //   jobDescription:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+        //       '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
+        //       '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
+        //       '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
+        // },{
+        //   id:'4',
+        //   companyname:'XXX科技公司',
+        //   name:'Java开发工程师',
+        //   isHot:'急招',
+        //   posCategory:'校园招聘',
+        //   category:'技术研究类',
+        //   country:'China',
+        //   workLocation:'北京，天津',
+        //   jobDescription:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+        //       '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
+        //       '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
+        //       '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市。'
+        // }
       ]
     }
   },
   mounted() {
-    this.handleSpinShow();
+    // this.handleSpinShow();
+    this.tokenFix = inject("tokenFix");
+    this.getAllPosition();
     // this.handleSpinCustom();
   },
   methods:{
@@ -203,6 +212,29 @@ export default {
       setTimeout(() => {
         this.$Spin.hide();
       }, 3000);
+    },
+    getAllPosition(companyId){
+      this.$Spin.show();
+      var search = {
+        name: null,
+        companyId:companyId,
+        state:'审核通过'
+      }
+      axios.post(this.$apiBaseUrl+'/api/position/getAllPosition',search,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.itemList = res.data.data;
+          this.$Spin.hide();
+        }else{
+          this.$Message.error(res.data.message);
+          this.$Spin.hide();
+        }
+      })
     },
     handleSpinCustom () {
       this.$Spin.show({
@@ -223,12 +255,11 @@ export default {
         this.$Spin.hide();
       }, 3000);
     },
-    positionInfo(positionId){
+    positionInfo(positionId,companyId){
       if(positionId){
-        alert(positionId);
-        this.$router.push("/positionInfo")
+        this.$router.push({path:'/positionInfo',query:{positionId: positionId,companyId:companyId}})
       }else{
-        alert("查看职位信息")
+        alert("职位id为空")
       }
     }
   }

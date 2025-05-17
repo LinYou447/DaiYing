@@ -58,6 +58,7 @@
             <Button v-if="!this.editValue" style="width: 170px" type="primary" @click="handleSubmit('formValidate')">注 册</Button>
             <Button v-else style="width: 170px" type="primary" @click="handleSubmit('formValidate')">保 存</Button>
             <Button @click="login" style="margin-left: 8px;width: 170px">登 录</Button>
+            <Button @click="back" style="margin-left: 8px;width: 170px">返回</Button>
           </div>
         </FormItem>
       </Form>
@@ -68,6 +69,7 @@
 <script>
 import {Input} from "view-ui-plus";
 import axios from "axios";
+import {inject} from "vue";
 
 export default {
   name:'BiographicalNote',
@@ -81,11 +83,12 @@ export default {
     return{
       value1: '110000',
       editValue:false,
+      tokenFix:'',
       formValidate: {
-        username: '小不点',
-        password: '123456',
-        phone: '152035077334',
-        email: 'wojibuzhu447@163.com',
+        username: '',
+        password: '',
+        phone: '',
+        email: '',
       },
       ruleValidate: {
         username: [
@@ -105,8 +108,10 @@ export default {
     }
   },
   mounted() {
+    this.tokenFix = inject("tokenFix");
     if(this.$route.query.isEdit){
       this.editValue = this.$route.query.isEdit;
+      this.getUser();
     }else{
       this.editValue = false;
     }
@@ -114,6 +119,45 @@ export default {
   methods:{
     returnHome(){
       this.$router.push("/home")
+    },
+    back(){
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.push('/home');
+      }
+    },
+    getUser(){
+      axios.get(this.$apiBaseUrl+'/api/user/getById?id='+sessionStorage.getItem("userId"),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.formValidate = res.data.data;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
+    editUser(){
+      this.formValidate.id = sessionStorage.getItem("userId");
+      axios.post(this.$apiBaseUrl+'/api/user/editUser',JSON.stringify(this.formValidate),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.$Message.success(res.data.message);
+          this.$router.push("/login");
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
     },
     regedit(){
       this.formValidate.role = "JOBSEEKERS";
@@ -135,8 +179,7 @@ export default {
       this.$refs[name].validate((valid) => {
         if (valid) {
           if(this.editValue){
-            this.$Message.success('修改成功!');
-            this.$router.push("/login")
+            this.editUser();
           }else{
             this.regedit();
           }

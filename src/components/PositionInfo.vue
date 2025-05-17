@@ -172,18 +172,18 @@
         <div class="layout-content-left">
           <div class="layout-content-left-box">
             <div>
-              <h1 style="color: black">{{positionInfo.title}}</h1>
-              <span style="color: black;font-size: 14px">{{positionInfo.city}}&nbsp;&nbsp; |&nbsp;&nbsp; 职位ID： {{positionInfo.positionId}}&nbsp;&nbsp; |&nbsp;&nbsp; 薪资：{{positionInfo.money}}</span>
+              <h1 style="color: black">{{positionInfo.name}}</h1>
+              <span style="color: black;font-size: 14px">{{positionInfo.workLocation}}&nbsp;&nbsp; |&nbsp;&nbsp; 职位ID： {{positionInfo.positionCode}}&nbsp;&nbsp; |&nbsp;&nbsp; 薪资：{{positionInfo.money}}</span>
               <div style="width: 100%;display: flex;position: relative">
                 <div class="title-icon"></div>
                 <h2 class="font-h2">职位描述</h2>
               </div>
-              <span class="font-des-style">{{positionInfo.positionDesc}}</span>
+              <span class="font-des-style">{{positionInfo.jobDescription}}</span>
               <div style="width: 100%;display: flex;position: relative">
                 <div class="title-icon"></div>
                 <h2 class="font-h2">职位要求</h2>
               </div>
-              <span class="font-des-style">{{positionInfo.positionRequire}}</span>
+              <span class="font-des-style">{{positionInfo.jobRequirements}}</span>
             </div>
             <div style="margin-top: 30px;display: flex">
               <Button type="primary" @click="toBioView">申请职位</Button>
@@ -198,17 +198,17 @@
             <div class="layout-content-right-box-item">
               <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
               <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
-              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionCode}}</div>
             </div>
             <div class="layout-content-right-box-item">
               <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
               <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
-              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionCode}}</div>
             </div>
             <div class="layout-content-right-box-item">
               <div class="font-title-style" style="margin-bottom: 10px">c++开发工程师</div>
               <div class="font-style">{{positionInfo.city}}&nbsp;&nbsp; | &nbsp;&nbsp; 薪资：{{positionInfo.money}}</div>
-              <div class="font-style">职位ID： {{positionInfo.positionId}}</div>
+              <div class="font-style">职位ID： {{positionInfo.positionCode}}</div>
             </div>
           </div>
         </div>
@@ -221,22 +221,27 @@
 </template>
 <script>
 import {Button} from "view-ui-plus";
+import {inject} from "vue";
+import axios from "axios";
 
 export default {
   name:'PositionInfoPage',
   components: {Button},
   data(){
     return{
+      tokenFix:'',
+      positionId:null,
+      companyId:'',
       positionInfo:{
-        title:"JAVA开发工程师",
+        name:"JAVA开发工程师",
         city:'北京',
         money:'面谈',
-        positionId:'A47541',
-        positionDesc:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
+        positionCode:'A47541',
+        jobDescription:'面向2026届毕业生（2025年9月-2026年8月期间毕业），为符合岗位要求的同学提供转正机会。\n' +
             '团队介绍：本公司覆盖150个国家和地区的国际短视频平台，我们希望通过开发发现真实、有趣的瞬间，\n' +
             '让生活更美好。本公司在全球各地设有办公室，全球总部位于洛杉矶和新加坡，办公地点还包括纽约、\n' +
             '伦敦、都柏林、巴黎、柏林、迪拜、雅加达、首尔和东京等多个城市',
-        positionRequire:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
+        jobRequirements:'1、2025届获得本科及以上学历，计算机相关专业；\n' +
             '2、学习能力强，有独立解决问题的能力；\n' +
             '3、熟悉面向对象编程，掌握Java/C＋＋/Python/Go中的至少一门语言，Java/Go背景优先；\n' +
             '4、有良好的沟通能力和业务理解能力。'
@@ -247,15 +252,37 @@ export default {
     }
   },
   mounted() {
-    this.handleSpinShow();
+    this.tokenFix = inject("tokenFix");
+    this.positionId = this.$route.query.positionId;
+    this.companyId = this.$route.query.companyId;
+    // this.handleSpinShow();
+    this.getPositionInfo();
     // this.handleSpinCustom();
   },
   methods:{
-    handleSpinShow () {
+    // handleSpinShow () {
+    //   this.$Spin.show();
+    //   setTimeout(() => {
+    //     this.$Spin.hide();
+    //   }, 3000);
+    // },
+    getPositionInfo(){
       this.$Spin.show();
-      setTimeout(() => {
-        this.$Spin.hide();
-      }, 3000);
+      axios.get(this.$apiBaseUrl+'/api/position/getById?id='+this.positionId,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.$Spin.hide();
+          this.positionInfo = res.data.data;
+        }else{
+          this.$Spin.hide();
+          this.$Message.error(res.data.message);
+        }
+      })
     },
     handleMouseOver() {
       this.isHovered = true;
@@ -264,7 +291,7 @@ export default {
       this.isHovered = false;
     },
     toBioView(){
-      this.$router.push("/bioView")
+      this.$router.push({path:'/bioView',query:{positionId: this.positionId,companyId:this.companyId}})
     },
     toReturn(){
       this.$router.push("/position")

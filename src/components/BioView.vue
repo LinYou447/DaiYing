@@ -41,13 +41,13 @@
               <Input disabled v-model="formValidate.name"></Input>
             </FormItem>
             <FormItem label="性别" >
-              <RadioGroup v-model="formValidate.gender">
-                <Radio disabled label="male">男</Radio>
-                <Radio disabled label="female">女</Radio>
+              <RadioGroup v-model="formValidate.sex">
+                <Radio disabled label="1">男</Radio>
+                <Radio disabled label="0">女</Radio>
               </RadioGroup>
             </FormItem>
             <FormItem label="邮箱" disabled>
-              <Input disabled v-model="formValidate.mail" ></Input>
+              <Input disabled v-model="formValidate.email" ></Input>
             </FormItem>
           </Col>
           <Col span="2"></Col>
@@ -61,13 +61,13 @@
           <City disabled v-model="formValidate.city" />
         </FormItem>
         <FormItem label="籍贯">
-          <Input disabled v-model="formValidate.name1" ></Input>
+          <Input disabled v-model="formValidate.nativePlace" ></Input>
         </FormItem>
         <FormItem label="电话">
-          <Input disabled v-model="formValidate.name2" ></Input>
+          <Input disabled v-model="formValidate.phone" ></Input>
         </FormItem>
         <FormItem label="学历">
-          <RadioGroup v-model="formValidate.name3">
+          <RadioGroup v-model="formValidate.edu">
             <Radio disabled label="zhuanke">专科</Radio>
             <Radio disabled label="benke">本科</Radio>
             <Radio disabled label="shuoshi">硕士</Radio>
@@ -75,23 +75,23 @@
           </RadioGroup>
         </FormItem>
         <FormItem label="专业">
-          <Input disabled v-model="formValidate.name4"></Input>
+          <Input disabled v-model="formValidate.major"></Input>
         </FormItem>
         <FormItem label="教育背景">
-          <Input disabled v-model="formValidate.desc" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
+          <Input disabled v-model="formValidate.eduBack" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
         </FormItem>
         <FormItem label="实习经历">
-          <Input disabled v-model="formValidate.desc1" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
+          <Input disabled v-model="formValidate.internshipExperience" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
         </FormItem>
         <FormItem label="证书技能">
-          <Input disabled v-model="formValidate.desc2" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
+          <Input disabled v-model="formValidate.certificateSkills" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
         </FormItem>
         <FormItem label="自我评价">
-          <Input disabled v-model="formValidate.desc3" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
+          <Input disabled v-model="formValidate.selfEvaluation" type="textarea" :autosize="{minRows: 3,maxRows: 5}"></Input>
         </FormItem>
         <FormItem>
           <div class="buttonStyle">
-            <Button style="width: 170px" type="primary" @click="handleSubmit">提交申请</Button>
+            <Button style="width: 170px" type="primary" @click="create">提交申请</Button>
             <Button @click="returnHome" style="margin-left: 8px;width: 170px">取消</Button>
           </div>
         </FormItem>
@@ -102,6 +102,8 @@
 
 <script>
 import {Input} from "view-ui-plus";
+import axios from "axios";
+import {inject} from "vue";
 
 export default {
   name:'BiographicalNote',
@@ -109,34 +111,81 @@ export default {
   data(){
     return{
       value1: '110000',
+      tokenFix:'',
+      positionId:'',
+      companyId:'',
+      biographicalId:'',
       formValidate: {
-        name: '刘德华',
-        name1: '湖北省孝感市',
-        name2: '152035077334',
-        name3: 'benke',
-        name4: '软件工程',
-        mail: 'wojibuzhu447@163.com',
+        name: '',
+        nativePlace: '',
+        phone: '',
+        edu: '',
+        major: '',
+        email: '',
         city: '',
-        gender: 'male',
+        sex: '',
         interest: [],
         date: '',
         time: '',
-        desc: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc1: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc2: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        desc3: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        eduBack: '',
+        internshipExperience: '',
+        certificateSkills: '',
+        selfEvaluation: '',
       }
     }
   },
+  mounted() {
+    this.tokenFix = inject("tokenFix");
+    this.getInfo();
+    this.positionId = this.$route.query.positionId;
+    this.companyId = this.$route.query.companyId;
+  },
   methods:{
-    returnHome(){
-      this.$router.push("/positionInfo")
+    getInfo(){
+      axios.get(this.$apiBaseUrl+'/api/biographical/getByUserId?userId='+sessionStorage.getItem("userId"),
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          // this.$Message.success(res.data.message);
+          this.formValidate = res.data.data;
+          this.biographicalId = res.data.data.id;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
     },
-    handleSubmit () {
-      //检查简历信息是否完整
-      this.$Message.success('投递成功,2秒后自动返回！');
-      // this.$router.push("/position")
-      this.handleSpinShow();
+    returnHome(){
+      if (window.history.length > 1) {
+        this.$router.back();
+      } else {
+        this.$router.push('/home'); // 跳转到默认页
+      }
+    },
+    create(){
+      var req={
+        biographicalId:this.formValidate.id,
+        positionId:this.positionId,
+        companyId:this.companyId,
+        userId:sessionStorage.getItem("userId")
+      }
+      axios.post(this.$apiBaseUrl+'/api/positionRequest/createPositionRequest',req,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          this.$Message.success('投递成功,2秒后自动返回！');
+          this.handleSpinShow();
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
     },
     handleSpinShow () {
       setTimeout(() => {
