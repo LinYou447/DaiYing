@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .bioBody{
   width: 100%;
   height: 100%;
@@ -27,7 +27,7 @@
   justify-content: center;
 }
 .ivu-upload{
-  height: 150px;
+  height: 150px !important;
 }
 </style>
 
@@ -54,13 +54,19 @@
           <Col span="4">
             <div style="width: 100%;height: 20px">
               <Upload
-                  multiple
+                  ref="upload"
+                  :headers="headers"
+                  :action="uploadUrl"
+                  :before-upload="handleBeforeUpload"
+                  :on-success="handleSuccess"
+                  :format="['jpg','jpeg','png']"
+                  :max-size="10240"
+                  :show-upload-list="false"
                   type="drag"
-                  style="height: 200px;"
-                  action="//jsonplaceholder.typicode.com/posts/">
-                <div style="padding: 20px 0">
-                  <Icon type="md-add" size="52" style="color: #3399ff"></Icon>
-                  <p>上传照片</p>
+                  style="display: inline-block; width: 150px;">
+                <div style="width: 150px; height: 150px; line-height: 150px;">
+                  <img v-if="avatarUrl" :src="avatarUrl" style="width: 100%; height: 100%; object-fit: cover;">
+                  <Icon v-else type="ios-camera" size="40"></Icon>
                 </div>
               </Upload>
             </div>
@@ -122,24 +128,30 @@ export default {
   data(){
     return{
       value1: '110000',
+      headers: {},
+      uploadUrl: this.$apiBaseUrl+'/api/images/upload',
+      avatarUrl: "", // 用于显示头像的URL
+      uploading: false,
       tokenFix: '',
+      selectedFile: null,
+      previewUrl: '',
       formValidate: {
         id:'',
-        name: '刘德华',
-        nativePlace: '湖北省孝感市',
-        phone: '152035077334',
-        edu: 'benke',
-        major: '软件工程',
-        email: 'wojibuzhu447@163.com',
+        name: '',
+        nativePlace: '',
+        phone: '',
+        edu: '',
+        major: '',
+        email: '',
         city: '',
-        sex: '1',
+        sex: '',
         interest: [],
         date: '',
         time: '',
-        eduBack: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        internshipExperience: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        certificateSkills: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
-        selfEvaluation: 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+        eduBack: '',
+        internshipExperience: '',
+        certificateSkills: '',
+        selfEvaluation: '',
       },
       ruleValidate: {
         name: [
@@ -193,8 +205,65 @@ export default {
   mounted() {
     this.tokenFix = inject("tokenFix");
     this.getBiographical();
+    this.initHeaders();
   },
   methods:{
+    initHeaders() {
+      // 从localStorage或Vuex中获取token
+      const token = sessionStorage.getItem('token');
+
+      if (token) {
+        this.headers = {
+          'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+        }
+      }
+    },
+    handleBeforeUpload(file) {
+      // 上传前的验证
+      const isValidFormat = ['image/jpeg', 'image/png'].includes(file.type);
+      const isValidSize = file.size / 1024 <= 2048; // 2MB
+
+      if (!isValidFormat) {
+        this.$Message.error('头像图片格式必须为JPG或PNG!');
+      }
+      if (!isValidSize) {
+        this.$Message.error('头像图片大小不能超过10MB!');
+      }
+
+      // 同时设置上传状态
+      this.uploading = true;
+
+      return isValidFormat && isValidSize;
+    },
+    handleSuccess(response) {
+      // 上传成功后的处理
+      this.uploading = false;
+      if (response.code === 200) {
+        // 假设后端返回的数据中包含头像的URL
+        this.avatarUrl = response.data.url;
+        this.formValidate.imageId = response.data.imageId;
+        // 可以在这里触发事件将头像URL传递给父组件
+        this.$emit('on-upload-success', this.avatarUrl);
+      } else {
+        this.$Message.error(response.message || '上传失败');
+      }
+    },
+    getImage(){
+      axios.get(this.$apiBaseUrl+'/api/images/priviewImg/'+this.formValidate.imageId,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          // this.$Message.success(res.data.message);
+          this.avatarUrl = res.data.data.url;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
     getBiographical(){
       axios.get(this.$apiBaseUrl+'/api/biographical/getByUserId?userId='+sessionStorage.getItem("userId"),
           {
@@ -206,6 +275,9 @@ export default {
         if(res.data.code===200){
           // this.$Message.success(res.data.message);
           this.formValidate = res.data.data;
+          if(this.formValidate.imageId!=null && this.formValidate.imageId != ''){
+            this.getImage();
+          }
         }else{
           this.$Message.error(res.data.message);
         }
@@ -216,6 +288,10 @@ export default {
       this.tokenFix = inject('tokenFix');
     },
     handleSubmit (name) {
+      // if (!this.selectedFile) {
+      //   this.$Message.error("请上传照片！");
+      //   return;
+      // }
       this.$refs[name].validate((valid) => {
         if (valid) {
           this.formValidate.userId = sessionStorage.getItem("userId");

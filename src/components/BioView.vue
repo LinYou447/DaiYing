@@ -52,13 +52,26 @@
           </Col>
           <Col span="2"></Col>
           <Col span="4">
-            <div style="width: 100%;height: 150px;border: solid 1px black">
+<!--            <div style="width: 100%;height: 150px;border: solid 1px black">-->
 
-            </div>
+<!--            </div>-->
+            <Upload
+                ref="upload"
+                disabled
+                :format="['jpg','jpeg','png']"
+                :max-size="10240"
+                :show-upload-list="false"
+                type="drag"
+                style="display: inline-block; width: 150px;">
+              <div style="width: 150px; height: 150px; line-height: 150px;">
+                <img v-if="avatarUrl" :src="avatarUrl" style="width: 100%; height: 100%; object-fit: cover;">
+                <Icon v-else type="ios-camera" size="40"></Icon>
+              </div>
+            </Upload>
           </Col>
         </Row>
         <FormItem label="所在城市" prop="city">
-          <City disabled v-model="formValidate.city" />
+          <City use-name disabled v-model="formValidate.city" />
         </FormItem>
         <FormItem label="籍贯">
           <Input disabled v-model="formValidate.nativePlace" ></Input>
@@ -112,6 +125,7 @@ export default {
     return{
       value1: '110000',
       tokenFix:'',
+      avatarUrl:'',
       positionId:'',
       companyId:'',
       biographicalId:'',
@@ -141,6 +155,22 @@ export default {
     this.companyId = this.$route.query.companyId;
   },
   methods:{
+    getImage(){
+      axios.get(this.$apiBaseUrl+'/api/images/priviewImg/'+this.formValidate.imageId,
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': this.tokenFix + `${sessionStorage.getItem('token')}`
+            }
+          }).then(res=>{
+        if(res.data.code===200){
+          // this.$Message.success(res.data.message);
+          this.avatarUrl = res.data.data.url;
+        }else{
+          this.$Message.error(res.data.message);
+        }
+      })
+    },
     getInfo(){
       axios.get(this.$apiBaseUrl+'/api/biographical/getByUserId?userId='+sessionStorage.getItem("userId"),
           {
@@ -150,9 +180,9 @@ export default {
             }
           }).then(res=>{
         if(res.data.code===200){
-          // this.$Message.success(res.data.message);
           this.formValidate = res.data.data;
           this.biographicalId = res.data.data.id;
+          this.getImage();
         }else{
           this.$Message.error(res.data.message);
         }
@@ -180,6 +210,7 @@ export default {
             }
           }).then(res=>{
         if(res.data.code===200){
+          alert(1111)
           this.$Message.success('投递成功,2秒后自动返回！');
           this.handleSpinShow();
         }else{
