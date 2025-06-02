@@ -526,7 +526,7 @@ export default {
           previewId:item.imageIds[index]
         })
       })
-      // this.priviewList = item.priviewImageIds;
+      this.priviewList = item.priviewImageIds;
       // this.formItem = {};
     },
     delShare(id) {

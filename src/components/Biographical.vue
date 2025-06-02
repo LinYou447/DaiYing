@@ -59,6 +59,7 @@
                   :action="uploadUrl"
                   :before-upload="handleBeforeUpload"
                   :on-success="handleSuccess"
+                  :on-exceeded-size="handleMaxSize"
                   :format="['jpg','jpeg','png']"
                   :max-size="10240"
                   :show-upload-list="false"
@@ -218,22 +219,28 @@ export default {
         }
       }
     },
+    handleMaxSize (file) {
+      this.$Notice.warning({
+        title: '图片大小错误',
+        desc: file.name + '大小不能超过10M'
+      });
+    },
     handleBeforeUpload(file) {
       // 上传前的验证
       const isValidFormat = ['image/jpeg', 'image/png'].includes(file.type);
-      const isValidSize = file.size / 1024 <= 2048; // 2MB
+      // const isValidSize = file.size / 1024 <= 2048; // 2MB
 
       if (!isValidFormat) {
         this.$Message.error('头像图片格式必须为JPG或PNG!');
       }
-      if (!isValidSize) {
-        this.$Message.error('头像图片大小不能超过10MB!');
-      }
+      // if (!isValidSize) {
+      //   this.$Message.error('头像图片大小不能超过10MB!');
+      // }
 
       // 同时设置上传状态
       this.uploading = true;
 
-      return isValidFormat && isValidSize;
+      return isValidFormat ;
     },
     handleSuccess(response) {
       // 上传成功后的处理
